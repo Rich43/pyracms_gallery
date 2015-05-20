@@ -1,16 +1,16 @@
-from pyramid.config import Configurator
-from sqlalchemy import engine_from_config
-
-from .models import DBSession
-
-def main(global_config, **settings):
-    """ This function returns a Pyramid WSGI application.
-    """
-    engine = engine_from_config(settings, 'sqlalchemy.')
-    DBSession.configure(bind=engine)
-    config = Configurator(settings=settings)
-    config.add_static_view('static', 'static', cache_max_age=3600)
-    config.add_route('home', '/')
-    config.scan()
-    return config.make_wsgi_app()
+def includeme(config):
+    """ Activate the forum; usually called via
+    ``config.include('pyracms_forum')`` instead of being invoked
+    directly. """
+    config.include('pyramid_jinja2')
+    config.add_jinja2_search_path("pyracms_gallery:templates")
+    config.add_route('create_album', '/gallery/create_album')
+    config.add_route('rename_album', '/gallery/rename_album')
+    config.add_route('show_album', '/gallery/album/{album_id}')
+    config.add_route('delete_album', '/gallery/delete_album/{album_id}')
+    config.add_route('create_picture', '/gallery/create_picture')
+    config.add_route('show_picture', '/gallery/picture/{picture_id}')
+    config.add_route('delete_picture', 
+                     '/gallery/delete_picture/{picture_id}')
+    config.scan("pyracms_gallery.views")
 

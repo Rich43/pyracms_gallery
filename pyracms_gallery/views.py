@@ -1,34 +1,29 @@
-from pyramid.response import Response
 from pyramid.view import view_config
 
-from sqlalchemy.exc import DBAPIError
+@view_config(route_name='create_album', permission='create_album')
+def create_album(context, request):
+    pass
+    
+@view_config(route_name='show_album', permission='show_album')
+def show_album(context, request):
+    pass
 
-from .models import (
-    DBSession,
-    MyModel,
-    )
-
-@view_config(route_name='home', renderer='templates/mytemplate.pt')
-def my_view(request):
-    try:
-        one = DBSession.query(MyModel).filter(MyModel.name=='one').first()
-    except DBAPIError:
-        return Response(conn_err_msg, content_type='text/plain', status_int=500)
-    return {'one':one, 'project':'pyracms_gallery'}
-
-conn_err_msg = """\
-Pyramid is having a problem using your SQL database.  The problem
-might be caused by one of the following things:
-
-1.  You may need to run the "initialize_pyracms_gallery_db" script
-    to initialize your database tables.  Check your virtual 
-    environment's "bin" directory for this script and try to run it.
-
-2.  Your database server may not be running.  Check that the
-    database server referred to by the "sqlalchemy.url" setting in
-    your "development.ini" file is running.
-
-After you fix the problem, please restart the Pyramid application to
-try it again.
-"""
-
+@view_config(route_name='rename_album', permission='rename_album')
+def rename_album(context, request):
+    pass
+    
+@view_config(route_name='delete_album', permission='delete_album')
+def delete_album(context, request):
+    pass
+    
+@view_config(route_name='create_picture', permission='create_picture')
+def create_picture(context, request):
+    pass
+    
+@view_config(route_name='show_picture', permission='show_picture')
+def show_picture(context, request):
+    pass
+    
+@view_config(route_name='delete_picture', permission='delete_picture')
+def delete_picture(context, request):
+    pass
