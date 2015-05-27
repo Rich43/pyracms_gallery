@@ -6,11 +6,10 @@ def includeme(config):
     config.add_jinja2_search_path("pyracms_gallery:templates")
     config.add_route('create_album', '/gallery/create_album')
     config.add_route('rename_album', '/gallery/rename_album')
-    config.add_route('show_album', '/gallery/album/{album_id}')
-    config.add_route('delete_album', '/gallery/delete_album/{album_id}')
-    config.add_route('create_picture', '/gallery/create_picture')
-    config.add_route('show_picture', '/gallery/picture/{picture_id}')
+    config.add_route('show_album', '/gallery/album/{album_id:\d+}')
+    config.add_route('delete_album', '/gallery/delete_album/{album_id:\d+}')
+    config.add_route('show_picture', '/gallery/picture/{picture_id:\d+}')
     config.add_route('delete_picture', 
-                     '/gallery/delete_picture/{picture_id}')
+                     '/gallery/delete_picture/{album_id:\d+}/{picture_id:\d+}')
     config.scan("pyracms_gallery.views")
 

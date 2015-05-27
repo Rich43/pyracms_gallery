@@ -1,0 +1,24 @@
+{% extends "main.jinja2" %}
+{% block title %} - Album{% endblock %}
+{% block content %}
+    <div class="picturediv">
+        {%  if picture.display_name %}
+            <h1>{{ picture.display_name }}</h1>
+        {%  endif %}
+        {%  if picture.file_obj.is_picture %}
+        <img src="{{ w.get_upload_url(request) }}{{
+            picture.file_obj.uuid }}/{{ picture.file_obj.name }}"
+            /></a>
+        {% endif %}
+        {%  if picture.file_obj.is_video %}
+         <video width="800" height="600" poster="{{ w.get_upload_url(request)
+                 }}{{
+            picture.file_obj.uuid }}/{{ split_ext(picture.file_obj.name) }}
+            .thumbnail.png" controls>
+          <source src="{{ w.get_upload_url(request) }}{{
+            picture.file_obj.uuid }}/{{ picture.file_obj.name }}" type="video/mp4">
+             Your browser does not support the video tag.
+        </video>
+        {% endif %}
+    </div>
+{% endblock %}

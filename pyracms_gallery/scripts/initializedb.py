@@ -1,5 +1,7 @@
 import os
 import sys
+from pyracms.lib.userlib import UserLib
+from pyramid.security import Allow, Everyone
 import transaction
 
 from sqlalchemy import engine_from_config
@@ -9,11 +11,9 @@ from pyramid.paster import (
     setup_logging,
     )
 
-from ..models import (
-    DBSession,
-    MyModel,
-    Base,
-    )
+from pyracms.models import DBSession, Base
+from pyracms.factory import RootFactory
+from ..models import GalleryPicture, GalleryAlbum
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
@@ -31,5 +31,13 @@ def main(argv=sys.argv):
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
     with transaction.manager:
-        model = MyModel(name='one', value=1)
-        DBSession.add(model)
+        u = UserLib()
+        u.create_group("gallery", "Gallery Group", [u.show("admin")])
+        acl = RootFactory()
+        acl.__acl__.append((Allow, Everyone, 'show_album'))
+        acl.__acl__.append((Allow, Everyone, 'show_picture'))
+        acl.__acl__.append((Allow, "group:gallery", "group:gallery"))
+        acl.__acl__.append((Allow, "group:gallery", "create_album"))
+        acl.__acl__.append((Allow, "group:gallery", "rename_album"))
+        acl.__acl__.append((Allow, "group:gallery", "delete_album"))
+        acl.__acl__.append((Allow, "group:gallery", "delete_picture"))
