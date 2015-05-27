@@ -45,6 +45,7 @@ def rename_album(context, request):
 def delete_album(context, request):
     g = GalleryLib()
     album_id = request.matchdict.get('album_id')
+    g.delete_album(album_id, request)
     return redirect(request, "home")
     
 @view_config(route_name='show_picture', permission='show_picture',
@@ -59,4 +60,5 @@ def delete_picture(context, request):
     g = GalleryLib()
     album_id = request.matchdict.get('album_id')
     picture_id = request.matchdict.get('picture_id')
-    return redirect(request, "home")
+    g.delete_picture(picture_id, request)
+    return redirect(request, "show_album", album_id=album_id)
