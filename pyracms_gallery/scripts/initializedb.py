@@ -46,3 +46,11 @@ def main(argv=sys.argv):
         group = MenuGroup("picture_admin")
         DBSession.add(Menu("Edit", "/gallery/update_picture/%(album_id)s/" +
                            "%(picture_id)s", 1, group, 'update_picture'))
+        DBSession.add(Menu("Delete", "/gallery/delete_picture/%(album_id)s/" +
+                           "%(picture_id)s", 2, group, 'delete_picture'))
+
+        group = MenuGroup("album_admin")
+        DBSession.add(Menu("Edit", "/gallery/update_album/%(album_id)s", 1,
+                           group, 'update_album'))
+        DBSession.add(Menu("Delete", "/gallery/delete_album/%(album_id)s", 2,
+                           group, 'delete_album'))

@@ -1,7 +1,10 @@
 from pyracms import DBSession
 from pyracms.lib.filelib import FileLib
+from pyracms.lib.taglib import TagLib, GALLERY
 from sqlalchemy.orm.exc import NoResultFound
-from ..models import GalleryAlbum, GalleryPicture
+from ..models import GalleryAlbum, GalleryPicture, GalleryPictureTags
+
+
 class AlbumNotFound(Exception):
     pass
 class PictureNotFound(Exception):
@@ -9,10 +12,18 @@ class PictureNotFound(Exception):
 class InvalidPicture(Exception):
     pass
 class GalleryLib:
-    def create_album(self, display_name, description):
+    """
+    A library to manage the gallery database.
+    """
+
+    def __init__(self):
+        self.t = TagLib(GalleryPictureTags, GALLERY)
+
+    def create_album(self, display_name, description, user):
         album = GalleryAlbum()
         album.display_name = display_name
         album.description = description
+        album.user = user
         DBSession.add(album)
         DBSession.flush()
         return album.id
@@ -24,7 +35,7 @@ class GalleryLib:
             raise AlbumNotFound
         return page
 
-    def update_album(self, album_id, display_name, description):
+    def update_album(self, album_id, display_name, description, tags=''):
         album = self.show_album(album_id)
         album.display_name = display_name
         album.description = description
@@ -35,8 +46,8 @@ class GalleryLib:
             self.delete_picture(item.id, request)
         DBSession.delete(album)
 
-    def create_picture(self, album_obj, file_obj, mimetype, filename, request,
-                       display_name=""):
+    def create_picture(self, album_obj, file_obj, mimetype, filename,
+                       user, request, display_name="", tags=''):
         file_lib = FileLib(request)
         aio_obj = file_lib.write(filename, file_obj, mimetype, True)
         if not aio_obj.is_picture and not aio_obj.is_video:
@@ -46,6 +57,8 @@ class GalleryLib:
         picture.album_obj = album_obj
         picture.file_obj = aio_obj
         picture.display_name = display_name
+        picture.user = user
+        self.t.set_tags(picture, tags)
         DBSession.add(picture)
         album_obj.pictures.append(picture)
         DBSession.flush()
@@ -59,10 +72,11 @@ class GalleryLib:
             raise PictureNotFound
         return page
 
-    def update_picture(self, picture_id, display_name, description):
+    def update_picture(self, picture_id, display_name, description, tags=''):
         pic = self.show_picture(picture_id)
         pic.display_name = display_name
         pic.description = description
+        self.t.set_tags(pic, tags)
 
     def delete_picture(self, picture_id, request):
         picture = self.show_picture(picture_id)

@@ -7,6 +7,16 @@
         {{ form | safe }}
     </div>
     {%  endif %}
+  {% set album_admin = w.generate_menu("album_admin", context,
+  request, {"album_id": album_id}) %}
+  {% if album_admin %}
+    <div class="album_admin">
+      {%- for item in album_admin: %}
+      <a href="{{ item[0] }}">{{ item[1] }}</a>
+          {% if not item[2] %}|{% endif %}
+      {%- endfor %}
+    </div>
+  {% endif %}
     <div class="album_description">{{ album.description }}</div>
     <div class="album">
         {% for picture in album.pictures %}
@@ -29,7 +39,7 @@
                     <div class="picture_description">
                         {% if picture.description %}
                             {{ w.render_article("BBCODE",
-                            picture.description) | safe }}
+                            picture.description) | safe | truncate(64) }}
                         {%  else %}
                             No Description Available
                         {% endif %}

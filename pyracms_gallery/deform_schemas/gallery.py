@@ -13,3 +13,4 @@ class CreateAlbum(Schema):
 class EditPicture(Schema):
     display_name = SchemaNode(String(), widget=TextInputWidget(size=40))
     description = SchemaNode(String(), widget=TextAreaWidget(cols=140, rows=20))
+    tags = SchemaNode(String(), widget=TextInputWidget(size=40), missing='')
