@@ -1,14 +1,14 @@
 {% extends "main.jinja2" %}
 {% block title %} - Album{% endblock %}
 {% block content %}
-    <div class="picturediv">
+    <div class="picture_container_two">
         {%  if picture.display_name %}
             <h1>{{ picture.display_name }}</h1>
         {%  endif %}
         {%  if picture.file_obj.is_picture %}
         <img src="{{ w.get_upload_url(request) }}{{
             picture.file_obj.uuid }}/{{ picture.file_obj.name }}"
-            /></a>
+            width="800" /></a>
         {% endif %}
         {%  if picture.file_obj.is_video %}
          <video width="800" height="600" poster="{{ w.get_upload_url(request)
@@ -20,5 +20,25 @@
              Your browser does not support the video tag.
         </video>
         {% endif %}
+        <div class="picture_caption_two">
+            <div class="picture_description_two">
+                {% if picture.description %}
+                    {{ w.render_article("BBCODE",
+                    picture.description) | safe }}
+                {%  else %}
+                    No Description Available
+                {% endif %}
+            </div>
+              {% set pic_admin = w.generate_menu("picture_admin", context,
+              request, {"album_id": album_id, "picture_id": picture.id}) %}
+              {% if pic_admin %}
+                <div class="picture_admin_two">
+                  {%- for item in pic_admin: %}
+                  <a href="{{ item[0] }}">{{ item[1] }}</a>
+                      {% if not item[2] %}|{% endif %}
+                  {%- endfor %}
+                </div>
+              {% endif %}
+        </div>
     </div>
 {% endblock %}

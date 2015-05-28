@@ -11,7 +11,7 @@ from pyramid.paster import (
     setup_logging,
     )
 
-from pyracms.models import DBSession, Base
+from pyracms.models import DBSession, Base, MenuGroup, Menu
 from pyracms.factory import RootFactory
 from ..models import GalleryPicture, GalleryAlbum
 
@@ -38,6 +38,11 @@ def main(argv=sys.argv):
         acl.__acl__.append((Allow, Everyone, 'show_picture'))
         acl.__acl__.append((Allow, "group:gallery", "group:gallery"))
         acl.__acl__.append((Allow, "group:gallery", "create_album"))
-        acl.__acl__.append((Allow, "group:gallery", "rename_album"))
+        acl.__acl__.append((Allow, "group:gallery", "update_album"))
         acl.__acl__.append((Allow, "group:gallery", "delete_album"))
+        acl.__acl__.append((Allow, "group:gallery", "update_picture"))
         acl.__acl__.append((Allow, "group:gallery", "delete_picture"))
+
+        group = MenuGroup("picture_admin")
+        DBSession.add(Menu("Edit", "/gallery/update_picture/%(album_id)s/" +
+                           "%(picture_id)s", 1, group, 'update_picture'))

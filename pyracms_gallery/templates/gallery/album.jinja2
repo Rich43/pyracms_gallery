@@ -1,19 +1,51 @@
 {% extends "main.jinja2" %}
 {% block title %} - Viewing Album {{ display_name }}{% endblock %}
 {% block content %}
-    <h1>{{ display_name }}</h1>
-    <div class="albumupload">
+    <h2>{{ album.display_name }}</h2>
+    {% if request.has_permission('update_picture') %}
+    <div class="album_upload">
         {{ form | safe }}
     </div>
+    {%  endif %}
+    <div class="album_description">{{ album.description }}</div>
     <div class="album">
-        {% for picture in pictures %}
-            <span class="picturespan">
-                <a href="/gallery/picture/{{ picture.id }}">
+        {% for picture in album.pictures %}
+            <div class="picture_container">
+                <div class="picture">
+                    <a href="/gallery/picture/{{ album_id }}/{{ picture.id }}">
                     <img src="{{ w.get_upload_url(request) }}{{
                         picture.file_obj.uuid }}/{{ split_ext(picture
                         .file_obj.name) }}.thumbnail.png"
                         /></a>
-            </span>
+                </div>
+                <div class="picture_caption">
+                    <div class="picture_display_name">
+                        {% if picture.display_name %}
+                            <h3>{{ picture.display_name }}</h3>
+                        {%  else %}
+                            <h3>Untitled</h3>
+                        {% endif %}
+                    </div>
+                    <div class="picture_description">
+                        {% if picture.description %}
+                            {{ w.render_article("BBCODE",
+                            picture.description) | safe }}
+                        {%  else %}
+                            No Description Available
+                        {% endif %}
+                    </div>
+                </div>
+              {% set pic_admin = w.generate_menu("picture_admin", context,
+              request, {"album_id": album_id, "picture_id": picture.id}) %}
+              {% if pic_admin %}
+                <div class="picture_admin">
+                  {%- for item in pic_admin: %}
+                  <a href="{{ item[0] }}">{{ item[1] }}</a>
+                      {% if not item[2] %}|{% endif %}
+                  {%- endfor %}
+                </div>
+              {% endif %}
+            </div>
         {%  endfor %}
     </div>
 {% endblock %}

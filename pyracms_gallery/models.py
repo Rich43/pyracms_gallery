@@ -1,9 +1,11 @@
 from datetime import datetime
+
 from pyracms.models import Base, Files
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.expression import desc
-from sqlalchemy.types import Integer, Unicode, DateTime, Boolean
+from sqlalchemy import Integer, Unicode, DateTime, Boolean, UnicodeText
+
 
 class GalleryPicture(Base):
     __tablename__ = 'gallerypicture'
@@ -11,6 +13,7 @@ class GalleryPicture(Base):
 
     id = Column(Integer, primary_key=True)
     display_name = Column(Unicode(128), index=True, default="")
+    description = Column(UnicodeText, default='')
     created = Column(DateTime, default=datetime.now)
     private = Column(Boolean, default=False, index=True)
     album_id = Column(Integer, ForeignKey('galleryalbum.id'), 
@@ -26,6 +29,7 @@ class GalleryAlbum(Base):
 
     id = Column(Integer, primary_key=True)
     display_name = Column(Unicode(128), index=True, nullable=False)
+    description = Column(UnicodeText, default='')
     created = Column(DateTime, default=datetime.now)
     private = Column(Boolean, default=False, index=True)
     pictures = relationship(GalleryPicture,

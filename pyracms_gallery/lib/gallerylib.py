@@ -9,9 +9,10 @@ class PictureNotFound(Exception):
 class InvalidPicture(Exception):
     pass
 class GalleryLib:
-    def create_album(self, display_name):
+    def create_album(self, display_name, description):
         album = GalleryAlbum()
         album.display_name = display_name
+        album.description = description
         DBSession.add(album)
         DBSession.flush()
         return album.id
@@ -23,9 +24,10 @@ class GalleryLib:
             raise AlbumNotFound
         return page
 
-    def rename_album(self, album_id, display_name):
+    def update_album(self, album_id, display_name, description):
         album = self.show_album(album_id)
         album.display_name = display_name
+        album.description = description
 
     def delete_album(self, album_id, request):
         album = self.show_album(album_id)
@@ -56,6 +58,11 @@ class GalleryLib:
         except NoResultFound:
             raise PictureNotFound
         return page
+
+    def update_picture(self, picture_id, display_name, description):
+        pic = self.show_picture(picture_id)
+        pic.display_name = display_name
+        pic.description = description
 
     def delete_picture(self, picture_id, request):
         picture = self.show_picture(picture_id)

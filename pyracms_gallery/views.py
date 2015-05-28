@@ -10,12 +10,30 @@ def split_ext(path):
 
 @view_config(route_name='create_album', permission='create_album',
              renderer='pyracms:templates/deform.jinja2')
+@view_config(route_name='update_album', permission='create_album',
+             renderer='pyracms:templates/deform.jinja2')
 def create_album(context, request):
     def create_album_submit(context, request, deserialized, bind_params):
-        album_id = GalleryLib().create_album(deserialized['display_name'])
+        g = GalleryLib()
+        album_id = request.matchdict.get("album_id")
+        if album_id:
+            g.update_album(album_id, deserialized['display_name'],
+                           deserialized['description'])
+        else:
+            album_id = g.create_album(deserialized['display_name'],
+                                      deserialized['description'])
         return redirect(request, "show_album", album_id=str(album_id))
-    return rapid_deform(context, request, CreateAlbum, create_album_submit)
-    
+    description = ""
+    display_name = ""
+    album_id = request.matchdict.get("album_id")
+    if album_id:
+        g = GalleryLib()
+        album = g.show_album(album_id)
+        description = album.description
+        display_name = album.display_name
+    return rapid_deform(context, request, CreateAlbum, create_album_submit,
+                        description=description, display_name=display_name)
+
 @view_config(route_name='show_album', permission='show_album',
              renderer='gallery/album.jinja2')
 def show_album(context, request):
@@ -34,12 +52,9 @@ def show_album(context, request):
             pass
         return redirect(request, "show_album", album_id=str(album_id))
     return rapid_deform(context, request, PictureUpload, picture_upload_submit,
-                        album_id=album_id, display_name=album.display_name,
-                        pictures=album.pictures, split_ext=split_ext)
+                        album_id=album_id, album=album, split_ext=split_ext)
 
-@view_config(route_name='rename_album', permission='rename_album')
-def rename_album(context, request):
-    return redirect(request, "home")
+
     
 @view_config(route_name='delete_album', permission='delete_album')
 def delete_album(context, request):
@@ -52,9 +67,26 @@ def delete_album(context, request):
              renderer='gallery/picture.jinja2')
 def show_picture(context, request):
     g = GalleryLib()
+    album_id = request.matchdict.get('album_id')
     picture_id = request.matchdict.get('picture_id')
-    return dict(picture=g.show_picture(picture_id), split_ext=split_ext)
-    
+    return dict(picture=g.show_picture(picture_id), split_ext=split_ext,
+                album_id=album_id, picture_id=picture_id)
+
+@view_config(route_name='update_picture', permission='update_picture',
+             renderer='pyracms:templates/deform.jinja2')
+def update_picture(context, request):
+    picture_id = request.matchdict.get("picture_id")
+    g = GalleryLib()
+    def update_picture_submit(context, request, deserialized, bind_params):
+        album_id = request.matchdict.get("album_id")
+        g.update_picture(picture_id, deserialized['display_name'],
+                         deserialized['description'])
+        return redirect(request, "show_album", album_id=str(album_id))
+    album = g.show_picture(picture_id)
+    return rapid_deform(context, request, CreateAlbum, update_picture_submit,
+                        description=album.description,
+                        display_name=album.display_name)
+
 @view_config(route_name='delete_picture', permission='delete_picture')
 def delete_picture(context, request):
     g = GalleryLib()
