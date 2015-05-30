@@ -11,7 +11,7 @@ from pyramid.paster import (
     setup_logging,
     )
 
-from pyracms.models import DBSession, Base, MenuGroup, Menu
+from pyracms.models import DBSession, Base, MenuGroup, Menu, Settings
 from pyracms.factory import RootFactory
 from ..models import GalleryPicture, GalleryAlbum
 
@@ -54,3 +54,4 @@ def main(argv=sys.argv):
                            group, 'update_album'))
         DBSession.add(Menu("Delete", "/gallery/delete_album/%(album_id)s", 2,
                            group, 'delete_album'))
+        DBSession.add(Settings("PYRACMS_GALLERY"))
