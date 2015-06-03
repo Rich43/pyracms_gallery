@@ -1,5 +1,6 @@
 import os
 import sys
+from pyracms.lib.settingslib import SettingsLib
 from pyracms.lib.userlib import UserLib
 from pyramid.security import Allow, Everyone
 import transaction
@@ -32,7 +33,7 @@ def main(argv=sys.argv):
     Base.metadata.create_all(engine)
     with transaction.manager:
         u = UserLib()
-        u.create_group("gallery", "Gallery Group", [u.show("admin")])
+        u.create_group("gallery", "Gallery Group")
         acl = RootFactory()
         acl.__acl__.append((Allow, Everyone, 'show_album'))
         acl.__acl__.append((Allow, Everyone, 'show_picture'))
@@ -54,4 +55,8 @@ def main(argv=sys.argv):
                            group, 'update_album'))
         DBSession.add(Menu("Delete", "/gallery/delete_album/%(album_id)s", 2,
                            group, 'delete_album'))
-        DBSession.add(Settings("PYRACMS_GALLERY"))
+
+        s = SettingsLib()
+        s.create("PYRACMS_GALLERY")
+        s.update("DEFAULTGROUPS", s.show_setting("DEFAULTGROUPS") +
+                 "gallery\n")
