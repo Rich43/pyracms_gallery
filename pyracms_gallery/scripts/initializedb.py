@@ -1,5 +1,6 @@
 import os
 import sys
+from pyracms.lib.menulib import MenuLib
 from pyracms.lib.settingslib import SettingsLib
 from pyracms.lib.userlib import UserLib
 from pyramid.security import Allow, Everyone
@@ -44,17 +45,18 @@ def main(argv=sys.argv):
         acl.__acl__.append((Allow, "group:gallery", "update_picture"))
         acl.__acl__.append((Allow, "group:gallery", "delete_picture"))
 
-        group = MenuGroup("picture_admin")
-        DBSession.add(Menu("Edit", "/gallery/update_picture/%(album_id)s/" +
-                           "%(picture_id)s", 1, group, 'update_picture'))
-        DBSession.add(Menu("Delete", "/gallery/delete_picture/%(album_id)s/" +
-                           "%(picture_id)s", 2, group, 'delete_picture'))
+        m = MenuLib()
+        group = m.add_group("picture_admin")
+        m.add_menu_item_url("Edit", "/gallery/update_picture/%(album_id)s/" +
+                            "%(picture_id)s", 1, group, 'update_picture')
+        m.add_menu_item_url("Delete", "/gallery/delete_picture/%(album_id)s/" +
+                            "%(picture_id)s", 2, group, 'delete_picture')
 
-        group = MenuGroup("album_admin")
-        DBSession.add(Menu("Edit", "/gallery/update_album/%(album_id)s", 1,
-                           group, 'update_album'))
-        DBSession.add(Menu("Delete", "/gallery/delete_album/%(album_id)s", 2,
-                           group, 'delete_album'))
+        group = m.add_group("album_admin")
+        m.add_menu_item_url("Edit", "/gallery/update_album/%(album_id)s", 1,
+                            group, 'update_album')
+        m.add_menu_item_url("Delete", "/gallery/delete_album/%(album_id)s", 2,
+                            group, 'delete_album')
 
         s = SettingsLib()
         s.create("PYRACMS_GALLERY")
