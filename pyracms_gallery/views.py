@@ -12,9 +12,9 @@ def split_ext(path):
 u = UserLib()
 
 @view_config(route_name='create_album', permission='create_album',
-             renderer='pyracms:templates/deform.jinja2')
+             renderer='deform.jinja2')
 @view_config(route_name='update_album', permission='create_album',
-             renderer='pyracms:templates/deform.jinja2')
+             renderer='deform.jinja2')
 def create_album(context, request):
     g = GalleryLib()
     def create_album_submit(context, request, deserialized, bind_params):
@@ -78,7 +78,7 @@ def show_picture(context, request):
                 album_id=album_id, picture_id=picture_id)
 
 @view_config(route_name='update_picture', permission='update_picture',
-             renderer='pyracms:templates/deform.jinja2')
+             renderer='deform.jinja2')
 def update_picture(context, request):
     g = GalleryLib()
     picture_id = request.matchdict.get("picture_id")
