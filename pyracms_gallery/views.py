@@ -1,15 +1,26 @@
 from pyracms.lib.helperlib import rapid_deform, redirect, get_username
 from pyracms.lib.userlib import UserLib
+from pyramid.httpexceptions import HTTPForbidden, HTTPNotFound
+from pyramid.security import has_permission
 from pyramid.view import view_config
-from pyramid.exceptions import HTTPNotFound
 from .deform_schemas.gallery import CreateAlbum, PictureUpload, EditPicture
 from .lib.gallerylib import GalleryLib, AlbumNotFound, InvalidPicture
 from os.path import splitext
 
+u = UserLib()
+
 def split_ext(path):
     return splitext(path)[0]
 
-u = UserLib()
+def check_owner(context, request):
+    album_id = request.matchdict.get('album_id')
+    g = GalleryLib()
+    page = g.show_album(album_id)
+    if (has_permission('gallery_mod', context, request) or
+        page.user == u.show(get_username(request))):
+        return True
+    else:
+        raise HTTPForbidden
 
 @view_config(route_name='create_album', permission='create_album',
              renderer='deform.jinja2')
@@ -63,6 +74,7 @@ def show_album(context, request):
     
 @view_config(route_name='delete_album', permission='delete_album')
 def delete_album(context, request):
+    check_owner(context, request)
     g = GalleryLib()
     album_id = request.matchdict.get('album_id')
     g.delete_album(album_id, request)
@@ -80,6 +92,7 @@ def show_picture(context, request):
 @view_config(route_name='update_picture', permission='update_picture',
              renderer='deform.jinja2')
 def update_picture(context, request):
+    check_owner(context, request)
     g = GalleryLib()
     picture_id = request.matchdict.get("picture_id")
     def update_picture_submit(context, request, deserialized, bind_params):
@@ -94,6 +107,7 @@ def update_picture(context, request):
 
 @view_config(route_name='delete_picture', permission='delete_picture')
 def delete_picture(context, request):
+    check_owner(context, request)
     g = GalleryLib()
     album_id = request.matchdict.get('album_id')
     picture_id = request.matchdict.get('picture_id')

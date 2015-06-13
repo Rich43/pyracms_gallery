@@ -38,6 +38,7 @@ def main(argv=sys.argv):
         acl = RootFactory()
         acl.__acl__.append((Allow, Everyone, 'show_album'))
         acl.__acl__.append((Allow, Everyone, 'show_picture'))
+        acl.__acl__.append((Allow, "group:admin", "gallery_mod"))
         acl.__acl__.append((Allow, "group:gallery", "group:gallery"))
         acl.__acl__.append((Allow, "group:gallery", "create_album"))
         acl.__acl__.append((Allow, "group:gallery", "update_album"))
