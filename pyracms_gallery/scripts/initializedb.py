@@ -47,17 +47,18 @@ def main(argv=sys.argv):
 
         m = MenuLib()
         group = m.add_group("picture_admin")
-        m.add_menu_item_url("Edit", "/gallery/update_picture/%(album_id)s/" +
-                            "%(picture_id)s", 1, group, 'update_picture')
-        m.add_menu_item_url("Delete", "/gallery/delete_picture/%(album_id)s/" +
-                            "%(picture_id)s", 2, group, 'delete_picture')
+        m.add_menu_item_route("Edit", "update_picture", 1, group,
+                              'update_picture')
+        m.add_menu_item_route("Delete", "delete_picture", 2, group,
+                              'delete_picture')
 
         group = m.add_group("album_admin")
-        m.add_menu_item_url("Edit", "/gallery/update_album/%(album_id)s", 1,
-                            group, 'update_album')
-        m.add_menu_item_url("Delete", "/gallery/delete_album/%(album_id)s", 2,
-                            group, 'delete_album')
+        m.add_menu_item_route("Edit", "update_album", 1, group, 'update_album')
+        m.add_menu_item_route("Delete", "delete_album", 2, group,
+                              'delete_album')
 
+        m.add_menu_item_route("Create Album", "create_album", 30,
+                              m.show_group("admin_area"), 'create_album')
         s = SettingsLib()
         s.create("PYRACMS_GALLERY")
         s.update("DEFAULTGROUPS", s.show_setting("DEFAULTGROUPS") +
