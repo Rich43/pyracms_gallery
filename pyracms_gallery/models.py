@@ -18,7 +18,7 @@ class GalleryPicture(Base):
     private = Column(Boolean, default=False, index=True)
     album_id = Column(Integer, ForeignKey('galleryalbum.id'), 
                       nullable=False)
-    album_obj = relationship("GalleryAlbum")
+    album_obj = relationship("GalleryAlbum", foreign_keys=[album_id])
     file_id = Column(Integer, ForeignKey('files.id'), nullable=True)
     file_obj = relationship(Files, cascade="all, delete")
     thread_id = Column(Integer, nullable=False, default=-1)
@@ -40,10 +40,15 @@ class GalleryAlbum(Base):
     private = Column(Boolean, default=False, index=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     user = relationship("User")
+    default_picture_id = Column(Integer, ForeignKey('gallerypicture.id'),
+                                nullable=True)
+    default_picture = relationship("GalleryPicture",
+                                   foreign_keys=[default_picture_id])
     pictures = relationship(GalleryPicture,
                             cascade="all, delete, delete-orphan",
                             lazy="dynamic",
-                            order_by=desc(GalleryPicture.created))
+                            order_by=desc(GalleryPicture.created),
+                            foreign_keys=[GalleryPicture.album_id])
 
 class GalleryPictureTags(Base):
     __tablename__ = 'gallerypicturetags'

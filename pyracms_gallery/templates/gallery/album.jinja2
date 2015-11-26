@@ -20,6 +20,14 @@
     <div class="album_description">{{ album.description }}</div>
     <div class="album">
         {% for picture in album.pictures %}
+            {% if album.default_picture %}
+                {% if loop.first %}
+                    {% set old_picture = picture %}
+                    {% set picture = album.default_picture %}
+                {% elif picture == album.default_picture %}
+                    {% set picture = old_picture %}
+                {% endif %}
+            {% endif %}
             <div class="picture_container">
                 <div class="picture">
                     <a href="/gallery/picture/{{ album_id }}/{{ picture.id }}">

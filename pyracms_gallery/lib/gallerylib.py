@@ -83,3 +83,7 @@ class GalleryLib:
         file_lib = FileLib(request)
         file_lib.delete(picture.file_obj)
         DBSession.delete(picture)
+
+    def default_picture(self, picture_id, album_id):
+        album = self.show_album(album_id)
+        album.default_picture_id = picture_id

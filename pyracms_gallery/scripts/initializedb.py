@@ -45,6 +45,7 @@ def main(argv=sys.argv):
         acl.__acl__.append((Allow, "group:gallery", "delete_album"))
         acl.__acl__.append((Allow, "group:gallery", "update_picture"))
         acl.__acl__.append((Allow, "group:gallery", "delete_picture"))
+        acl.__acl__.append((Allow, "group:gallery", "default_picture"))
 
         m = MenuLib()
         group = m.add_group("picture_admin")
@@ -52,6 +53,8 @@ def main(argv=sys.argv):
                               'update_picture')
         m.add_menu_item_route("Delete", "delete_picture", 2, group,
                               'delete_picture')
+        m.add_menu_item_route("Set as default picture", "default_picture", 3,
+                              group, 'default_picture')
 
         group = m.add_group("album_admin")
         m.add_menu_item_route("Edit", "update_album", 1, group, 'update_album')

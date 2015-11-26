@@ -113,3 +113,12 @@ def delete_picture(context, request):
     picture_id = request.matchdict.get('picture_id')
     g.delete_picture(picture_id, request)
     return redirect(request, "show_album", album_id=album_id)
+
+@view_config(route_name='default_picture', permission='default_picture')
+def default_picture(context, request):
+    check_owner(context, request)
+    g = GalleryLib()
+    album_id = request.matchdict.get('album_id')
+    picture_id = request.matchdict.get('picture_id')
+    g.default_picture(picture_id, album_id)
+    return redirect(request, "show_album", album_id=album_id)
