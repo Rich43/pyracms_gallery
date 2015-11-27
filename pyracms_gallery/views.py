@@ -77,7 +77,8 @@ def delete_album(context, request):
     check_owner(context, request)
     g = GalleryLib()
     album_id = request.matchdict.get('album_id')
-    g.delete_album(album_id, request)
+    if not g.show_album(album_id).protected:
+        g.delete_album(album_id, request)
     return redirect(request, "home")
     
 @view_config(route_name='show_picture', permission='show_picture',

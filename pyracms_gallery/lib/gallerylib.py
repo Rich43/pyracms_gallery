@@ -19,11 +19,12 @@ class GalleryLib:
     def __init__(self):
         self.t = TagLib(GalleryPictureTags, GALLERY)
 
-    def create_album(self, display_name, description, user):
+    def create_album(self, display_name, description, user, protected=False):
         album = GalleryAlbum()
         album.display_name = display_name
         album.description = description
         album.user = user
+        album.protected = protected
         DBSession.add(album)
         DBSession.flush()
         return album.id

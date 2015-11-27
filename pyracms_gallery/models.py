@@ -38,6 +38,7 @@ class GalleryAlbum(Base):
     description = Column(UnicodeText, default='')
     created = Column(DateTime, default=datetime.now)
     private = Column(Boolean, default=False, index=True)
+    protected = Column(Boolean, default=False, index=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     user = relationship("User")
     default_picture_id = Column(Integer, ForeignKey('gallerypicture.id'),
