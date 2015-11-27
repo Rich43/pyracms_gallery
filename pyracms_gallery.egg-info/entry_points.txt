@@ -1,0 +1,5 @@
+      [paste.app_factory]
+      main = pyracms_gallery:main
+      [console_scripts]
+      initialize_pyracms_gallery_db = pyracms_gallery.scripts.initializedb:main
+      

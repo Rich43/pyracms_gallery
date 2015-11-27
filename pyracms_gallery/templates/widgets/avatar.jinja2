@@ -1,0 +1,19 @@
+{% macro avatar(album_id, w, request, width=200) %}
+    {% if not w.get_gallerylib() %}
+        <img src="/static/blank.jpg"
+             {% if width %}width="{{ width }}"{% endif %}>
+    {%  else %}
+        {% set album = w.get_gallerylib().show_album(album_id) %}
+        {% if album.default_picture %}
+            {% set pic = album.default_picture %}
+        {%  else %}
+            {% set pic = album.pictures.first() %}
+        {% endif %}
+        <a href="{{ request.route_url("show_album", album_id=album.id) }}">
+        <img src={% if pic %}"{{ w.get_upload_url(request) }}{{ pic.file_obj.uuid }}/{{
+                w.splitext(pic.file_obj.name)[0] }}.thumbnail.png"
+                {% else %}"/static/blank.jpg"{% endif %}
+                {% if width %}width="{{ width }}"{% endif %}>
+        </a>
+    {% endif %}
+{% endmacro %}
