@@ -61,7 +61,7 @@ def main(argv=sys.argv):
         m.add_menu_item_route("Delete", "delete_album", 2, group,
                               'delete_album')
 
-        m.add_menu_item_route("Create Album", "create_album", 30,
+        m.add_menu_item_route("Create Gallery Album", "create_album", 30,
                               m.show_group("admin_area"), 'create_album')
         s = SettingsLib()
         s.create("PYRACMS_GALLERY")
