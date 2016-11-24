@@ -70,8 +70,6 @@ def show_album(context, request):
     return rapid_deform(context, request, PictureUpload, picture_upload_submit,
                         album_id=album_id, album=album, split_ext=split_ext)
 
-
-    
 @view_config(route_name='delete_album', permission='delete_album')
 def delete_album(context, request):
     check_owner(context, request)

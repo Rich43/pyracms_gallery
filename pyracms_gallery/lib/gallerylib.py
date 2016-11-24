@@ -49,6 +49,18 @@ class GalleryLib:
 
     def create_picture(self, album_obj, file_obj, mimetype, filename,
                        user, request, display_name="", tags=''):
+        """
+        Add a picture to a album
+        :param album_obj: An GalleryAlbum object
+        :param file_obj: A standard python file object
+        :param mimetype: Mimetype of file object
+        :param filename: Filename for file object
+        :param user: Pyracms User record
+        :param request: Pyramid request object
+        :param display_name: Display name for picture object
+        :param tags: Tags for picture object, comma seperated
+        :return: Picture ID
+        """
         file_lib = FileLib(request)
         aio_obj = file_lib.write(filename, file_obj, mimetype, True)
         if not aio_obj.is_picture and not aio_obj.is_video:
@@ -64,6 +76,31 @@ class GalleryLib:
         album_obj.pictures.append(picture)
         DBSession.flush()
         return picture.id
+
+    def create_picture_api(self, album_obj, api_file_obj, user, request,
+                           display_name, description, tags=''):
+        """
+        Add a picture to a album but customised for API
+        :param album_obj: An GalleryAlbum object
+        :param api_file_obj: A Pyracms Files object from model.
+        :param user: Pyracms User record
+        :param request: Pyramid request object
+        :param display_name: Display name for picture object
+        :param description: Description for picture object
+        :param tags: Tags for picture object, comma seperated
+        :return: picture object
+        """
+        picture = GalleryPicture()
+        picture.album_obj = album_obj
+        picture.file_obj = api_file_obj
+        picture.display_name = display_name
+        picture.description = description
+        picture.user = user
+        self.t.set_tags(picture, tags)
+        DBSession.add(picture)
+        album_obj.pictures.append(picture)
+        DBSession.flush()
+        return picture
 
     def show_picture(self, picture_id):
         try:

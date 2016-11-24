@@ -17,4 +17,4 @@ def includeme(config):
     config.add_route('default_picture',
                      '/gallery/default_picture/{album_id:\d+}/{picture_id:\d+}')
     config.scan("pyracms_gallery.views")
-
+    config.scan("pyracms_gallery.web_service_views")
