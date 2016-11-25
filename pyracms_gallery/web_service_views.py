@@ -1,5 +1,6 @@
 """
 TODO: Beef up security, check permissions
+TODO: Write documentation
 """
 from cornice import Service
 from cornice.validators import colander_body_validator
@@ -9,7 +10,8 @@ from pyracms_gallery.lib.gallerylib import (GalleryLib, AlbumNotFound,
                                             PictureNotFound)
 from .deform_schemas.gallery import CreateAlbum, EditPicture
 from pyracms.web_service_views import (valid_qs_int, valid_token,
-                                       valid_permission, valid_file_key)
+                                       valid_permission, valid_file_key,
+                                       APP_JSON)
 
 g = GalleryLib()
 u = UserLib()
@@ -49,8 +51,8 @@ def api_album_read(request):
             "number_of_pictures": album.pictures.count()}
 
 
-@album.put(schema=CreateAlbum, validators=(valid_token,
-                                           colander_body_validator))
+@album.put(schema=CreateAlbum, content_type=APP_JSON,
+           validators=(valid_token, colander_body_validator))
 def api_album_create(request):
     """
     Creates an album.
@@ -63,8 +65,9 @@ def api_album_create(request):
     return {"status": "created", "album_id": album_id}
 
 
-@album.patch(schema=CreateAlbum, validators=(valid_token, valid_album_id,
-                                             colander_body_validator))
+@album.patch(schema=CreateAlbum, content_type=APP_JSON,
+             validators=(valid_token, valid_album_id,
+                         colander_body_validator))
 def api_album_update(request):
     """
     Updates an album.
@@ -114,9 +117,9 @@ def api_picture_read(request):
             "description": picture.description}
 
 
-@picture.put(schema=EditPicture, validators=(valid_token, valid_album_id,
-                                             colander_body_validator,
-                                             valid_file_key))
+@picture.put(schema=EditPicture, content_type=APP_JSON,
+             validators=(valid_token, valid_album_id, colander_body_validator,
+                         valid_file_key))
 def api_picture_create(request):
     """
     Creates a picture.
@@ -150,8 +153,9 @@ def api_picture_create(request):
     return {"status": "created", "picture_id": picture_id.id}
 
 
-@picture.patch(schema=EditPicture, validators=(valid_token, valid_picture_id,
-                                               colander_body_validator))
+@picture.patch(schema=EditPicture, content_type=APP_JSON,
+               validators=(valid_token, valid_picture_id,
+                           colander_body_validator))
 def api_picture_update(request):
     """
     Updates a picture.
