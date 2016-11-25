@@ -59,7 +59,7 @@ def api_album_create(request):
     :param request: Standard pyramid request object.
     :return: JSON dictionary.
     """
-    user = u.show("admin")  # TODO: lookup user
+    user = request.validated['user_db']
     display_name, description, tags = quick_get_matchdict(request)
     album_id = g.create_album(display_name, description, user)
     return {"status": "created", "album_id": album_id}
@@ -74,7 +74,6 @@ def api_album_update(request):
     :param request: Standard pyramid request object.
     :return: JSON dictionary.
     """
-    user = u.show("admin")  # TODO: lookup user
     display_name, description, tags = quick_get_matchdict(request)
     album_id = request.params.get("album_id")
     g.update_album(album_id, display_name, description)
@@ -146,7 +145,7 @@ def api_picture_create(request):
         request.errors.add('querystring', 'album_not_found',
                            'album not found.')
         return
-    user = u.show("admin")  # TODO: lookup user
+    user = request.validated['user_db']
     display_name, description, tags = quick_get_matchdict(request)
     picture_id = g.create_picture_api(album, file_obj, user, request,
                                       display_name, description, tags)
@@ -162,7 +161,6 @@ def api_picture_update(request):
     :param request: Standard pyramid request object.
     :return: JSON dictionary.
     """
-    user = u.show("admin")  # TODO: lookup user
     display_name, description, tags = quick_get_matchdict(request)
     picture_id = request.params.get("picture_id")
     g.update_picture(picture_id, display_name, description)
