@@ -15,7 +15,8 @@ from pyracms.web_service_views import (valid_qs_int, valid_token,
 
 g = GalleryLib()
 u = UserLib()
-
+ALBUM = "album"
+PICTURE = "picture"
 
 def quick_get_matchdict(request):
     display_name = request.json_body.get('display_name') or ""
@@ -23,6 +24,19 @@ def quick_get_matchdict(request):
     tags = request.json_body.get('tags') or ""
     return display_name, description, tags
 
+def check_owner(request, obj_id, album_or_picture):
+    if album_or_picture == ALBUM:
+        obj = g.show_album(obj_id)
+    elif album_or_picture == PICTURE:
+        obj = g.show_picture(obj_id)
+    else:
+        raise Exception("Invalid argument %s" % album_or_picture)
+    if (valid_permission(request, 'gallery_mod') or
+        obj.user == request.validated['user_db']):
+        return True
+    else:
+        request.errors.add('body', 'access_denied', 'Access denied')
+    return False
 
 def valid_album_id(request, **kwargs):
     valid_qs_int(request, "album_id")
@@ -59,6 +73,9 @@ def api_album_create(request):
     :param request: Standard pyramid request object.
     :return: JSON dictionary.
     """
+    if not valid_permission(request, "create_album"):
+        request.errors.add('body', 'access_denied', 'Access denied')
+        return
     user = request.validated['user_db']
     display_name, description, tags = quick_get_matchdict(request)
     album_id = g.create_album(display_name, description, user)
@@ -74,8 +91,13 @@ def api_album_update(request):
     :param request: Standard pyramid request object.
     :return: JSON dictionary.
     """
+    if not valid_permission(request, "update_album"):
+        request.errors.add('body', 'access_denied', 'Access denied')
+        return
     display_name, description, tags = quick_get_matchdict(request)
     album_id = request.params.get("album_id")
+    if not check_owner(request, album_id, ALBUM):
+        return
     g.update_album(album_id, display_name, description)
     return {"status": "updated", "album_id": album_id}
 
@@ -91,6 +113,8 @@ def api_album_delete(request):
         request.errors.add('body', 'access_denied', 'Access denied')
         return
     album_id = int(request.params.get("album_id"))
+    if not check_owner(request, album_id, ALBUM):
+        return
     try:
         g.delete_album(album_id, request)
         return {"status": "deleted"}
@@ -125,6 +149,9 @@ def api_picture_create(request):
     :param request: Standard pyramid request object.
     :return: JSON dictionary.
     """
+    if not valid_permission(request, "update_picture"):
+        request.errors.add('body', 'access_denied', 'Access denied')
+        return
     # TODO: Create a BBThread
     f = FileLib(request)
     f.api_delete_expired()
@@ -161,8 +188,13 @@ def api_picture_update(request):
     :param request: Standard pyramid request object.
     :return: JSON dictionary.
     """
+    if not valid_permission(request, "update_picture"):
+        request.errors.add('body', 'access_denied', 'Access denied')
+        return
     display_name, description, tags = quick_get_matchdict(request)
     picture_id = request.params.get("picture_id")
+    if not check_owner(request, picture_id, PICTURE):
+        return
     g.update_picture(picture_id, display_name, description)
     return {"status": "updated", "picture_id": picture_id}
 
@@ -178,6 +210,8 @@ def api_picture_delete(request):
         request.errors.add('body', 'access_denied', 'Access denied')
         return
     picture_id = int(request.params.get("picture_id"))
+    if not check_owner(request, picture_id, PICTURE):
+        return
     try:
         g.delete_picture(picture_id, request)
         return {"status": "deleted"}
