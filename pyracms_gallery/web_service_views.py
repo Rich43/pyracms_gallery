@@ -1,20 +1,24 @@
 """
-TODO: Beef up security, check permissions
 TODO: Write documentation
 """
 from cornice import Service
 from cornice.validators import colander_body_validator
-from pyracms.lib.userlib import UserLib
+from pyracms import WidgetLib
 from pyracms.lib.filelib import FileLib, APIFileNotFound
-from pyracms_gallery.lib.gallerylib import (GalleryLib, AlbumNotFound,
-                                            PictureNotFound)
-from .deform_schemas.gallery import CreateAlbum, EditPicture
+from pyracms.lib.userlib import UserLib
 from pyracms.web_service_views import (valid_qs_int, valid_token,
                                        valid_permission, valid_file_key,
                                        APP_JSON)
+from pyracms_gallery.lib.gallerylib import (GalleryLib, AlbumNotFound,
+                                            PictureNotFound)
+from pyracms_gallery.views import split_ext
+
+from .deform_schemas.gallery import CreateAlbum, EditPicture
 
 g = GalleryLib()
 u = UserLib()
+w = WidgetLib()
+
 ALBUM = "album"
 PICTURE = "picture"
 
@@ -59,10 +63,20 @@ def api_album_read(request):
         request.errors.add('querystring', 'album_not_found',
                            'album not found.')
         return
-    # TODO: List Pictures
+    picture_list = []
+    for pic in album.pictures:
+        thumb_url = (w.get_upload_url(request) + pic.file_obj.uuid + "/" +
+                     split_ext(pic.file_obj.name) + ".thumbnail.png")
+        picture_list.append({"display_name": pic.display_name,
+                             "description": pic.description,
+                             "created": str(pic.created),
+                             "thumb_url": thumb_url,
+                             "pic_id": pic.id})
     return {"status": "ok", "display_name": album.display_name,
             "description": album.description,
-            "number_of_pictures": album.pictures.count()}
+            "number_of_pictures": album.pictures.count(),
+            "picture_list": picture_list,
+            "album_id": album.id}
 
 
 @album.put(schema=CreateAlbum, content_type=APP_JSON,
@@ -135,9 +149,10 @@ def api_picture_read(request):
         request.errors.add('querystring', 'picture_not_found',
                            'picture not found.')
         return
-    # TODO: More Detailed Listing
+    pic_url = (w.get_upload_url(request) + picture.file_obj.uuid + "/" +
+               picture.file_obj.name)
     return {"status": "ok", "display_name": picture.display_name,
-            "description": picture.description}
+            "description": picture.description, "pic_url": pic_url}
 
 
 @picture.put(schema=EditPicture, content_type=APP_JSON,
