@@ -11,5 +11,3 @@ COPY . /app
 
 RUN python setup.py install
 
-RUN initialize_pyracms_gallery_db production.ini
-
